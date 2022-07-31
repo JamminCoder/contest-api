@@ -2,6 +2,10 @@ const express = require('express');
 const mongoose  = require('mongoose');
 const User = require('./models/User').User;
 const bcrypt = require('bcrypt');
+const cors = require('cors');
+const cookieParser = require('cookie-parser');
+const generateJWT = require('./jwt').generateJWT;
+const jwt = require('jsonwebtoken');
 const saltRounds = 10;
 
 const app = express();
@@ -16,6 +20,8 @@ async function connectToDb() {
 
 
 app.use(express.json());
+app.use(cors());
+app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 
 
@@ -58,10 +64,10 @@ app.post('/register', async (req, res) => {
     bcrypt.hash(unhashedPassword, saltRounds, (err, hashedPassword) => {
         const newUser = new User({ username: username, password: hashedPassword });
         newUser.save();
+        res.send("All good!")
     });
 
-
-    res.send("Account created!");
+    
     
 });
 
@@ -78,7 +84,13 @@ app.post('/login', async (req, res) => {
     const user = await User.findOne({ username: username });
     bcrypt.compare(password, user.password, (err, passwordIsOk) => {
         if (passwordIsOk) {
-            res.send(`Loggin ${ user.username } in with ${ password }`);
+            const token = generateJWT(username);
+
+            res.json({
+                ok: true,
+                jwt: token
+            });
+
             return;
         }
 
@@ -87,6 +99,22 @@ app.post('/login', async (req, res) => {
 
 });
 
+
+app.get('/test_jwt', (req, res) => {
+    const token = req.cookies.jwt;
+
+    jwt.verify(token, process.env.TOKEN_SECRET, (err, decodedToken) => {
+
+        if (err) {
+            res.send("You are not allowed here!!");
+            return;
+        }
+
+        res.send(`Your JWT is ${token}. <br> Your username is ${ decodedToken.username }`);
+    });
+
+    
+});
 
 app.listen(port, () => {
     console.log(`API listening on port ${port}`);
