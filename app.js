@@ -5,6 +5,7 @@ const bcrypt = require('bcrypt');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const generateJWT = require('./jwt').generateJWT;
+const jwtExpireTime = require('./jwt').jwtExpireTimeSeconds;
 const jwt = require('jsonwebtoken');
 const saltRounds = 10;
 
@@ -64,10 +65,14 @@ app.post('/register', async (req, res) => {
     bcrypt.hash(unhashedPassword, saltRounds, (err, hashedPassword) => {
         const newUser = new User({ username: username, password: hashedPassword });
         newUser.save();
-        res.send("All good!")
+        const token = generateJWT(username);
+        res.json({
+            ok: true,
+            jwt: token,
+            expires: jwtExpireTime
+        });
     });
 
-    
     
 });
 
@@ -88,7 +93,8 @@ app.post('/login', async (req, res) => {
 
             res.json({
                 ok: true,
-                jwt: token
+                jwt: token,
+                expires: jwtExpireTime
             });
 
             return;
