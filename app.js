@@ -6,6 +6,7 @@ const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const generateJWT = require('./jwt').generateJWT;
 const jwtExpireTime = require('./jwt').jwtExpireTimeSeconds;
+const verifyAuthHeader = require('./middleware').verifyAuthHeader;
 const jwt = require('jsonwebtoken');
 const saltRounds = 10;
 
@@ -107,7 +108,7 @@ app.post('/login', async (req, res) => {
 
 
 app.get('/test_jwt', (req, res) => {
-    const token = req.cookies.jwt;
+    const token = req.query.jwt;
 
     jwt.verify(token, process.env.TOKEN_SECRET, (err, decodedToken) => {
 
@@ -121,6 +122,11 @@ app.get('/test_jwt', (req, res) => {
 
     
 });
+
+app.get('/secret', verifyAuthHeader, (req, res) => {
+    console.log(req.headers);
+    res.send('Welcome! You have passed authorization');
+})
 
 app.listen(port, () => {
     console.log(`API listening on port ${port}`);
