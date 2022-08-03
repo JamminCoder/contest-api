@@ -1,6 +1,5 @@
 const bcrypt = require('bcrypt');
-const generateJWT = require('../jwt').generateJWT;
-const jwtExpireTime = require('../jwt').jwtExpireTimeSeconds;
+const jwtTools = require('../jwtTools');
 
 const User = require('../models/User').User;
 
@@ -18,12 +17,12 @@ class AuthController {
         const user = await User.findOne({ username: username });
         bcrypt.compare(password, user.password, (err, passwordIsOk) => {
             if (passwordIsOk) {
-                const token = generateJWT(username);
+                const token = jwtTools.generateJWT(username);
     
                 res.json({
                     ok: true,
                     jwt: token,
-                    expires: jwtExpireTime
+                    expires: jwtTools.expireTime
                 });
     
                 return;
@@ -64,11 +63,11 @@ class AuthController {
 
             const newUser = new User({ username: username, password: hashedPassword });
             newUser.save();
-            const token = generateJWT(username);
+            const token = jwtTools.generateJWT(username);
             res.json({
                 ok: true,
                 jwt: token,
-                expires: jwtExpireTime
+                expires: jwtTools.expireTime
             });
         });
     
