@@ -23,13 +23,14 @@ app.use(express.urlencoded({ extended: true }));
 
 // Import controllers
 const AuthController = require('./controllers/AuthController').default;
-
+const ContestController = require('./controllers/ContestController').default;
 
 
 // Routes
 app.post('/register', AuthController.register);
 app.post('/login', AuthController.login);
 
+app.post('/contests/new', ContestController.new);
 
 
 
