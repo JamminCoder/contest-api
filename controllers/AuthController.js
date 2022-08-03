@@ -47,25 +47,21 @@ class AuthController {
             return;
         }
     
-        // Ensure password string(s) are valid
-        if (Buffer.byteLength(unhashedPassword) >= 255 || unhashedPassword.length > 32) {
-            res.send("Password is too long! Super long passwords can lead to vulnerabilies.");
+        // Check password strings for errors
+        const passwordError = AuthController.checkForPasswordError(unhashedPassword, confPassword);
+        if (passwordError) {
+            res.send(passwordError);
             return;
         }
-    
-        if (unhashedPassword.length < 8) {
-            res.send("Password too short! Must be atleast 8 characters long!");
-            return;
-        }
-    
-        // Make sure password and password confirmation match
-        if (!(unhashedPassword === confPassword)) {
-            res.send("Passwords do not match!");
-            return;
-        }
+        
     
         // All's good! Hash the password and store the user in the DB
         bcrypt.hash(unhashedPassword, saltRounds, (err, hashedPassword) => {
+            if (err) {
+                res.send("Something went wrong. Please try again.");
+                return;
+            }
+
             const newUser = new User({ username: username, password: hashedPassword });
             newUser.save();
             const token = generateJWT(username);
@@ -77,6 +73,23 @@ class AuthController {
         });
     
         
+    }
+
+    static checkForPasswordError(unhashedPassword, confPassword) {
+        if (Buffer.byteLength(unhashedPassword) >= 255 || unhashedPassword.length > 32) {
+            return "Password is too long! Super long passwords can lead to vulnerabilies.";
+        }
+    
+        if (unhashedPassword.length < 8) {
+            return "Password too short! Must be atleast 8 characters long!";
+        }
+    
+        // Make sure password and password confirmation match
+        if (!(unhashedPassword === confPassword)) {
+            return "Passwords do not match!";
+        }
+
+        return null;
     }
 };
 
