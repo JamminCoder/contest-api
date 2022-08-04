@@ -74,7 +74,23 @@ class ContestController {
             ok: true,
             message: "Success"
         });
+    }
 
+    static async updatePoints(req, res) {
+        const contenderName = req.body.contenderName;
+        const contestID = req.body.contestID;
+        const points = parseInt(req.body.points);
+        const result = await Contest.findOne(
+            {"contenders.contender": contenderName},
+            { contestID: contestID, contenders: { $elemMatch: {contender: contenderName}} }
+        );
+        
+        const lastPoints = result.contenders[0].points;
+            
+        await Contest.updateOne({contestID: 0, "contenders.contender": contenderName}, { $set: {"contenders.$.points": lastPoints + points }})
+
+
+        res.send("OK");
     }
 }
 
