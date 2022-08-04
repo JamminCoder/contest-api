@@ -58,8 +58,8 @@ class ContestController {
             contenderID: crypto.randomBytes(16).toString("hex")
         }
 
-        const currentContenders = await Contest.distinct("contenders.contender");
-        console.log(currentContenders);
+        const contest = await Contest.findOne({ contestID: contestID });
+        const currentContenders = contest.contenders.map(contender => contender.contender);
         if (currentContenders.includes(contenderName)) {
             res.send("Contender already exists!");
             return;
