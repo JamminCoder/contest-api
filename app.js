@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const connectToDb = require('./db').default;
+const verifyAuthHeader = require("./middleware/verifyAuthHeader").default;
 
 
 dotenv.config();
@@ -30,7 +31,7 @@ const ContestController = require('./controllers/ContestController').default;
 app.post('/register', AuthController.register);
 app.post('/login', AuthController.login);
 
-app.post('/contests/new', ContestController.new);
+app.post('/contests/new', verifyAuthHeader, ContestController.new);
 app.get("/contests/list", ContestController.list);
 app.get("/contests/show", ContestController.show);
 app.post("/contests/new_contender", ContestController.newContender);
