@@ -31,6 +31,7 @@ app.post('/register', AuthController.register);
 app.post('/login', AuthController.login);
 
 app.post('/contests/new', ContestController.new);
+app.get("/contests/list", ContestController.list);
 
 
 
