@@ -4,6 +4,7 @@ const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const connectToDb = require('./db').default;
 const verifyAuthHeader = require("./middleware/verifyAuthHeader").default;
+const verifyContestBelongsToUser = require("./middleware/verifyContestBelongsToUser").default;
 
 
 dotenv.config();
@@ -34,8 +35,8 @@ app.post('/login', AuthController.login);
 app.post('/contests/new', verifyAuthHeader, ContestController.new);
 app.get("/contests/list", ContestController.list);
 app.get("/contests/show", ContestController.show);
-app.post("/contests/new_contender", ContestController.newContender);
-app.post("/contests/update_points", ContestController.updatePoints);
+app.post("/contests/new_contender", verifyAuthHeader, verifyContestBelongsToUser, ContestController.newContender);
+app.post("/contests/update_points", verifyAuthHeader, verifyContestBelongsToUser, ContestController.updatePoints);
 
 
 app.listen(port, () => {
