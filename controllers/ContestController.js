@@ -1,4 +1,5 @@
 const jwtTools = require("../jwtTools");
+const crypto = require("crypto");
 
 const Contest = require('../models/Contest').default;
 
@@ -7,6 +8,11 @@ class ContestController {
     static async list(req, res) {
         const contests = await Contest.find();
         res.json({contests: contests});
+    }
+
+    static async show(req, res) {
+        const contest = await Contest.findOne({ contestID: req.query.contestID });
+        return res.json({contest: contest});
     }
 
     static async new(req, res) {
@@ -23,18 +29,13 @@ class ContestController {
 
         const contestManager = await jwtTools.getUsernameFromRequest(req);
         const contestID = await Contest.getNextID();
-
-
-        console.log(`Name: ${ contestName }`)
-        console.log(`Manager: ${ contestManager }`)
-        console.log(`ID: ${ contestID }`)
-        console.log(`Point Type: ${ pointType }`)
         
         const contest = new Contest({ 
             contestID: contestID,
             contestManager: contestManager,
             contestName: contestName,
             pointType: pointType,
+            contenders: []
         });
 
         contest.save();
@@ -43,6 +44,37 @@ class ContestController {
             ok: true,
             message: "Successfully created contest",
         });
+    }
+
+
+    static async newContender(req, res) {
+        const contenderName = req.body.contender;
+        const startingPoints = parseInt(req.body.points) || 0;
+        const contestID = parseInt(req.body.contestID);
+
+        const newContender = {
+            contender: contenderName,
+            points: startingPoints,
+            contenderID: crypto.randomBytes(16).toString("hex")
+        }
+
+        const currentContenders = await Contest.distinct("contenders.contender");
+        console.log(currentContenders);
+        if (currentContenders.includes(contenderName)) {
+            res.send("Contender already exists!");
+            return;
+        }
+        
+        await Contest.updateOne(
+            { contestID: contestID }, 
+            { $push: { contenders: newContender } }
+        );
+
+        res.json({
+            ok: true,
+            message: "Success"
+        });
+
     }
 }
 

@@ -5,6 +5,7 @@ const contestSchema = mongoose.Schema({
     contestManager: String,
     contestName: String,
     pointType: String,
+    contenders: Array
 },
 {
     statics: {
