@@ -37,7 +37,7 @@ app.get("/contests/list", ContestController.list);
 app.get("/contests/show", ContestController.show);
 app.post("/contests/new_contender", verifyAuthHeader, verifyContestBelongsToUser, ContestController.newContender);
 app.post("/contests/update_points", verifyAuthHeader, verifyContestBelongsToUser, ContestController.updatePoints);
-
+app.get("/user", AuthController.getUser);
 
 app.listen(port, () => {
     console.log(`API listening on port ${port}`);

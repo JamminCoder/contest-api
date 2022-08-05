@@ -74,6 +74,11 @@ class AuthController {
         
     }
 
+    static async getUser(req, res) {
+        const username = await jwtTools.getUsernameFromRequest(req);
+        res.send(username);
+    }
+
     static checkForPasswordError(unhashedPassword, confPassword) {
         if (Buffer.byteLength(unhashedPassword) >= 255 || unhashedPassword.length > 32) {
             return "Password is too long! Super long passwords can lead to vulnerabilies.";
