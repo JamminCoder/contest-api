@@ -16,7 +16,7 @@ class ContestController {
 
     static async new(req, res) {
         const contestName = req.body.name;
-        const pointType = req.body.pointType;
+        let pointType = req.body.pointType;
 
         if (!contestName) {
             res.send("Contest name required!");
