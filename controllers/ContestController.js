@@ -1,6 +1,4 @@
 const jwtTools = require("../jwtTools");
-const crypto = require("crypto");
-
 const Contest = require('../models/Contest').default;
 
 
@@ -11,7 +9,8 @@ class ContestController {
     }
 
     static async show(req, res) {
-        const contest = await Contest.findOne({ contestID: req.query.contestID });
+        const contestID = req.params.contestID;
+        const contest = await Contest.findOne({ contestID: contestID });
         return res.json({contest: contest});
     }
 
@@ -44,63 +43,6 @@ class ContestController {
             ok: true,
             message: "Successfully created contest",
         });
-    }
-
-
-    static async newContender(req, res) {
-        const contenderName = req.body.contender;
-        const startingPoints = parseInt(req.body.points) || 0;
-        const contestID = parseInt(req.body.contestID);
-
-        const newContender = {
-            contender: contenderName,
-            points: startingPoints,
-            contenderID: crypto.randomBytes(16).toString("hex")
-        }
-
-        const contest = await Contest.findOne({ contestID: contestID });
-        const currentContenders = contest.contenders.map(contender => contender.contender);
-        if (currentContenders.includes(contenderName)) {
-            res.send("Contender already exists!");
-            return;
-        }
-        
-        await Contest.updateOne(
-            { contestID: contestID }, 
-            { $push: { contenders: newContender } }
-        );
-
-        res.json({
-            ok: true,
-            message: "Success"
-        });
-    }
-
-    static async updatePoints(req, res) {
-        const contenderName = req.body.contenderName;
-        const contestID = req.body.contestID;
-        const points = parseInt(req.body.points);
-
-        console.log(contenderName)
-        console.log(contestID);
-        console.log(points);
-
-        try {
-            const result = await Contest.findOne(
-                {"contenders.contender": contenderName},
-                { contestID: contestID, contenders: { $elemMatch: {contender: contenderName} } }
-            );
-            
-            const lastPoints = result.contenders[0].points;
-                
-            await Contest.updateOne({contestID: contestID, "contenders.contender": contenderName}, { $set: {"contenders.$.points": lastPoints + points }})
-    
-    
-            res.send("OK");
-        } catch (err) {
-            console.log(err);
-        }
-        
     }
 }
 
