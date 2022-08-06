@@ -3,7 +3,7 @@ const Contender = require("../models/Contender").default;
 class ContenderController {
     static async getContendersFromContest(req, res) {
         const contestID = req.params.contestID;
-        const contenders = await Contender.find({ belongsToContestID: contestID });
+        const contenders = await Contender.find({ belongsToContestID: contestID }).sort({points: -1});
         res.json({
             contenders: contenders
         });
