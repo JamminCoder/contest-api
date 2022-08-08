@@ -33,6 +33,12 @@ app.post('/register', AuthController.register);
 app.post('/login', AuthController.login);
 
 app.post('/contests/new', verifyAuthHeader, ContestController.new);
+app.delete("/contests/:contestID/delete",
+    verifyAuthHeader,
+    verifyContestBelongsToUser,
+    ContestController.delete
+);
+
 app.get("/contests/list", ContestController.list);
 app.get("/contests/:contestID/show", ContestController.show);
 

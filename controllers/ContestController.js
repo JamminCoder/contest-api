@@ -1,3 +1,4 @@
+const Contender = require("../models/Contender").default;
 const jwtTools = require("../jwtTools");
 const Contest = require('../models/Contest').default;
 
@@ -43,6 +44,19 @@ class ContestController {
             ok: true,
             message: "Successfully created contest",
         });
+    }
+
+    static async delete(req, res) {
+        const contestID = req.params.contestID;
+
+        try {
+            await Contest.deleteOne({ contestID: contestID });
+            await Contender.deleteMany({ belongsToContestID: contestID });
+            res.send("OK");
+        } catch (err) {
+            console.log(err);
+            res.send("Something when wrong");
+        }
     }
 }
 
