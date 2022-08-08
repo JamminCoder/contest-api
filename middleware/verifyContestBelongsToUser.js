@@ -4,7 +4,9 @@ const Contest = require("../models/Contest").default;
 
 async function verifyContestBelongsToUser(req, res, next) {
     const username = await jwtTools.getUsernameFromRequest(req);
-    const contestID = req.body.contestID;
+    let contestID = req.body.contestID;
+    if (contestID === undefined) contestID = req.params.contestID;
+
     const contest = await Contest.findOne({ contestID: contestID })
     if (!contest) {
         res.send("Cannot find contest");

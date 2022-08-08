@@ -42,6 +42,12 @@ app.post("/contests/:contestID/new_contender",
     ContenderController.newContender
 );
 
+app.delete("/contests/:contestID/delete_contender/:contenderName",
+    verifyAuthHeader,
+    verifyContestBelongsToUser,
+    ContenderController.deleteContender
+)
+
 app.post("/contests/update_points",
     verifyAuthHeader,
     verifyContestBelongsToUser,

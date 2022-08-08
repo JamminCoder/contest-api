@@ -45,6 +45,14 @@ class ContenderController {
             message: "Success"
         });
     }
+
+    static async deleteContender(req, res) {
+        const contestID = req.params.contestID;
+        const contenderName = req.params.contenderName;
+
+        await Contender.deleteOne({ belongsToContestID: contestID, name: contenderName })
+        res.send("Deleted contender");
+    }
 }
 
 module.exports = { default: ContenderController };
