@@ -12,10 +12,12 @@ class ContenderController {
     static async updatePoints(req, res) {
         const contenderName = req.body.contenderName;
         const contestID = req.body.contestID;
-        const points = parseInt(req.body.points);
+        let points = parseInt(req.body.points);
 
         const contender = await Contender.findOne({ belongsToContestID: contestID, name: contenderName },);
         contender.points += points;
+
+        if (points < 1) points *= -1;
         contender.lastPoints = points;
         contender.save();
     }
