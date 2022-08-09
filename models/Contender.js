@@ -3,7 +3,8 @@ const mongoose = require("mongoose");
 const contenderSchema = mongoose.Schema({
     name: String,
     belongsToContestID: Number,
-    points: Number
+    points: Number,
+    lastPoints: Number,
 }
 );
 

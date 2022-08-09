@@ -16,6 +16,7 @@ class ContenderController {
 
         const contender = await Contender.findOne({ belongsToContestID: contestID, name: contenderName },);
         contender.points += points;
+        contender.lastPoints = points;
         contender.save();
     }
 
@@ -27,7 +28,8 @@ class ContenderController {
         const contender = new Contender({
             name: contenderName,
             belongsToContestID: contestID,
-            points: startingPoints
+            points: startingPoints,
+            lastPoints: 5,
         });
 
         const contenders = await Contender.find({ belongsToContestID: contestID });
